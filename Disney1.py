@@ -1,52 +1,41 @@
-import pandas as pd ### import = import library
+import pandas as pd  ### import = import library
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-
-### as = renaming
-
 disneyData = pd.read_csv("disney_movies_total_gross.csv")
-print(disneyData)
-print(disneyData.dtypes)
-
-
-
-
-
 ####change our columns names
-disneyData.rename(columns={'movie_title':"movieTitle", "release_date":"releaseDate", "MPAA_rating":"rating", "total_gross": "totalGross", 'inflation_adjusted_gross':'inflationGross'}, inplace=True)
-print(disneyData)
-#####drop a row
-#disneyData.drop(axis=0)
-##drop a column
-#disneyData=disneyData.drop(['inflation_adjusted_gross'],axis=1)
-print(disneyData)
+disneyData.rename(columns={'movie_title': "movieTitle", "release_date": "releaseDate", "MPAA_rating": "rating",
+                           "total_gross": "totalGross", 'inflation_adjusted_gross': 'inflationGross'}, inplace=True)
 
 ###redeclare several variables as catagories
-#change this collum = as catagory(dataFrame["column"]
-disneyData["genre"]=pd.Categorical(disneyData["genre"]) ## telling python disney data is to become catagorical data
-disneyData["rating"]=pd.Categorical(disneyData["rating"])
-
-
-disneyData["totalGross"]=disneyData["totalGross"].astype(str)
+# change this collum = as catagory(dataFrame["column"]
+disneyData["genre"] = pd.Categorical(disneyData["genre"])  ## telling python disney data is to become catagorical data
+disneyData["rating"] = pd.Categorical(disneyData["rating"])
+disneyData["totalGross"] = disneyData["totalGross"].astype(str)  # convert to string to strip
+disneyData['totalGross'] = disneyData['totalGross'].str.replace(',', '')  # strip
+disneyData['totalGross'] = disneyData['totalGross'].str.replace('$', '')  # strip
+disneyData['inflationGross'] = disneyData['inflationGross'].astype(str)  # turn to string to strip
+disneyData['inflationGross'] = disneyData['inflationGross'].str.replace(',', '')  # strp
+disneyData['inflationGross'] = disneyData['inflationGross'].str.replace('$', '')  # strip
+disneyData['inflationGross'] = disneyData['inflationGross'].astype(float)  # turn to float now datas numerical
+disneyData["totalGross"] = disneyData["totalGross"].astype(float)  ##turn to float
+disneyData['releaseDate'] = disneyData['releaseDate'].astype(str)
+disneyData['releaseDate'] = disneyData['releaseDate'].str.replace('Jan', '01')  # strip
+disneyData['releaseDate'] = disneyData['releaseDate'].str.replace('Feb', '02')  # strip
+disneyData['releaseDate'] = disneyData['releaseDate'].str.replace('Mar', '03')  # strip
+disneyData['releaseDate'] = disneyData['releaseDate'].str.replace('Apr', '04')  # strip
+disneyData['releaseDate'] = disneyData['releaseDate'].str.replace('May', '05')  # strip
+disneyData['releaseDate'] = disneyData['releaseDate'].str.replace('Jun', '06')  # strip
+disneyData['releaseDate'] = disneyData['releaseDate'].str.replace('Jul', '07')  # strip
+disneyData['releaseDate'] = disneyData['releaseDate'].str.replace('Aug', '08')  # strip
+disneyData['releaseDate'] = disneyData['releaseDate'].str.replace('Sep', '09')  # strip
+disneyData['releaseDate'] = disneyData['releaseDate'].str.replace('Oct', '10')  # strip
+disneyData['releaseDate'] = disneyData['releaseDate'].str.replace('Nov', '11')  # strip
+disneyData['releaseDate'] = disneyData['releaseDate'].str.replace('Dec', '12')  # strip
+disneyData["movieTitle"] = pd.Categorical(disneyData["movieTitle"])
+disneyData['releaseDate'] = pd.to_datetime(disneyData['releaseDate'], infer_datetime_format=True)
 print(disneyData.dtypes)
-disneyData['totalGross'] = disneyData['totalGross'].str.replace(',', '')
-disneyData['totalGross'] = disneyData['totalGross'].str.replace('$', '')
-
-disneyData['inflationGross'] = disneyData['inflationGross'].astype(str)
-disneyData['inflationGross'] = disneyData['inflationGross'].str.replace(',', '')
-disneyData['inflationGross'] = disneyData['inflationGross'].str.replace('$', '')
-
-disneyData['inflationGross'] = disneyData['inflationGross'].astype(float)
-disneyData["totalGross"]=disneyData["totalGross"].astype(float)
-
-print(disneyData.dtypes)
-
-## shows you first entries if you want a specific number put value in head eg disneyData.head(100)
-print(disneyData.head())
-## shows you last entries
-print(disneyData.tail())
 
 
 ####function to get a bunch of count data
@@ -60,24 +49,35 @@ def summerize_data(df1):
 
         print('\n')
 
-summerize_data(disneyData)
 
-##disneyData.plot(x='disneyData.index', y='totalGross' , kind='scatter')
+# disneyData2=disneyData.sort_values('totalGross', ascending=True)
+# disneyData2=disneyData.sort_values('inflationGross', ascending=True)
+disneyData2 = disneyData
 
-disneyData2=disneyData.head(100)
+# print(disneyData2)
 
+##inflated date along with the year it was made in ascending order
+panderrr = disneyData.sort_values('releaseDate', ascending=True)
+releaseDateandInflat = sns.lmplot(x='releaseDate', y='inflationGross', data=panderrr, fit_reg=False, hue='genre')
 
-fig, axs = plt.subplots(ncols=2)
-g=sns.lmplot( x="movieTitle", y="totalGross", data=disneyData2, fit_reg=False ,hue='genre', legend=True)
-f=sns.lmplot( x="movieTitle", y="inflationGross", data=disneyData2, fit_reg=False ,hue='genre', legend=True)
+sns.set(font_scale=1)
+##plot inflation gross data
+rando = sns.lmplot(x='releaseDate', y='inflationGross', data=disneyData2, fit_reg=False, hue='movieTitle', legend=True,
+                   height=10, aspect=3)
+rando.set_xticklabels(rotation=90)
 
-
-plt.legend(loc='lower right')
+##plot some data without proportional adjustments
+g = sns.lmplot(x="movieTitle", y="totalGross", data=disneyData2, fit_reg=False, hue='genre', legend=True, height=5,
+               aspect=3)
+f = sns.lmplot(x="movieTitle", y="inflationGross", data=disneyData2, fit_reg=False, hue='genre', legend=True, height=5,
+               aspect=3)
 g.set_xticklabels(rotation=90)
 f.set_xticklabels(rotation=90)
+
+disneyData2.groupby(['genre']).mean()
+print(disneyData2.groupby(['genre']).mean())
+
+disneyData2.groupby('genre').agg(lambda x: sum(x)).plot(kind='pie', subplots=True,
+                                                        title='Gross by each genre: with inflation and without[proprtional]')
+
 plt.show()
-
-
-
-
-
